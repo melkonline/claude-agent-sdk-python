@@ -1,21 +1,36 @@
-# Use Python 3.11 slim image as base
 FROM python:3.11-slim
 
+# Install Node.js (required for Claude Code CLI)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+       bash curl wget git build-essential jq nano procps \
+    && curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set working directory
-WORKDIR /app
+WORKDIR /workspace
+
+# Create non-root user for runtime
+RUN useradd -ms /bin/bash agent \
+    && usermod -aG root agent \
+    && mkdir -p /home/agent \
+    && chown -R agent:root /home/agent && chmod -R 775 /home/agent \
+    && chown -R agent:root /workspace && chmod -R 775 /workspace
+
+# Install Claude Code CLI
+RUN npm install -g @anthropic-ai/claude-code@latest
+
+# Switch to non-root user
+USER agent
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
-
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    git \
-    && rm -rf /var/lib/apt/lists/*
 
 # Copy only dependency files first (for better caching)
 COPY pyproject.toml README.md ./
