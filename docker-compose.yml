@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  claude-agent-api:
+  claude-agent-sdk-api:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: claude-agent-api
+    container_name: claude-agent-sdk-api
     ports:
       - "8000:8000"
     environment:
