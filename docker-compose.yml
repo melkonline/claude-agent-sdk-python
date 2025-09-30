@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  claude-agent-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claude-agent-api
+    ports:
+      - "8000:8000"
+    environment:
+      # Set your Anthropic API key here or via .env file
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      # Optional: For AWS Bedrock
+      # - CLAUDE_CODE_USE_BEDROCK=${CLAUDE_CODE_USE_BEDROCK:-0}
+      # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # - AWS_REGION=${AWS_REGION}
+      # Optional: For Google Vertex AI
+      # - CLAUDE_CODE_USE_VERTEX=${CLAUDE_CODE_USE_VERTEX:-0}
+      # - GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+    volumes:
+      # Optional: Mount local directory for file operations
+      - ./workspace:/app/workspace
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
