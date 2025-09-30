@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: claude-agent-sdk-api
     container_name: claude-agent-sdk-api
     ports:
       - "8000:8000"
