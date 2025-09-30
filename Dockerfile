@@ -11,12 +11,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
-WORKDIR /workspace
+WORKDIR /app
 
 # Create non-root user for runtime
 RUN useradd -ms /bin/bash agent \
     && usermod -aG root agent \
     && mkdir -p /home/agent \
+    && mkdir -p /workspace \
     && chown -R agent:root /home/agent && chmod -R 775 /home/agent \
     && chown -R agent:root /workspace && chmod -R 775 /workspace
 
@@ -33,8 +34,7 @@ ENV PYTHONUNBUFFERED=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Copy only dependency files first (for better caching)
-COPY pyproject.toml README.md ./
-COPY src/ ./src/
+COPY . .
 
 # Install Python dependencies
 RUN pip install --upgrade pip && \

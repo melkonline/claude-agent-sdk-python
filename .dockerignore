@@ -45,7 +45,7 @@ docker-compose.yml
 .dockerignore
 
 # Documentation
-*.md
+# *.md
 docs/
 
 # CI/CD
